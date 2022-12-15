@@ -2,7 +2,7 @@
 #include <iostream>
 using namespace std;
 
-#define ITEM_TYPE 5
+#define ITEM_NUM 5
 
 struct ItemData
 {
@@ -11,7 +11,7 @@ struct ItemData
 	string name = "";
 };
 
-const ItemData ItemDatabase[ITEM_TYPE] = {
+const ItemData ITEM_DATABASE[ITEM_NUM] = {
 	{0, 100, "사과"},
 	{1, 2000, "검"},
 	{2, 2000, "방패"},
@@ -24,6 +24,6 @@ struct Item {
 	ItemData data;
 
 	Item(int itemKey, int count = 1) : itemKey(itemKey), count(count) {
-		data = ItemDatabase[itemKey];
+		data = ITEM_DATABASE[itemKey];
 	}
 };

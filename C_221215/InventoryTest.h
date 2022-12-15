@@ -8,12 +8,13 @@ struct DoublyNode;
 template <typename T>
 class DoublyLinkedList;
 
+enum class InputType
+{
+	NONE, UP, DOWN, YES, CANCEL,
+};
+
 class InventoryTest
 {
-	enum class InputType
-	{
-		NONE, UP, DOWN, YES, CANCEL,
-	};
 	bool requestInput = false;
 	bool requestRender = true;
 	InputType input = InputType::NONE;
@@ -37,15 +38,15 @@ public:
 	void Run();
 	void Render();
 
-	void AddMoney(int gain) { money += gain; }
-	bool AblePay(int pay) { return money >= pay; }
-	bool UseMoney(int pay);
 
+	void OpenShop();
 	void AddItem(int id, int cnt);
 
 private:
 	int money = 0;
 	int cursor = 0;
 	DoublyLinkedList<Item>* list;
+
+	class Shop* shop = nullptr;
 };
 

@@ -119,12 +119,19 @@ inline void DoublyLinkedList<T>::Erase(int pos)
 	if (node->prev != nullptr) {
 		node->prev->next = node->next;
 	}
+	else {
+		head = node->next;
+	}
 	if (node->next != nullptr) {
 		node->next->prev = node->prev;
+	}
+	else {
+		tail = node->prev;
 	}
 
 	node->prev = nullptr;
 	node->next = nullptr;
+	size--;
 	delete node;
 }
 

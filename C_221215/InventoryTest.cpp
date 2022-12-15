@@ -4,19 +4,22 @@
 #include "Node.h"
 #include "LinkedList.h"
 #include "DoublyLinkedList.h"
+#include "Shop.h"
 #include <conio.h>
 
 InventoryTest::InventoryTest()
 {
     list = new DoublyLinkedList<Item>();
+    shop = new Shop();
 }
 
 InventoryTest::~InventoryTest()
 {
     delete list;
+    delete shop;
 }
 
-InventoryTest::InputType InventoryTest::GetInput()
+InputType InventoryTest::GetInput()
 {
     if (!requestInput)
         return InputType::NONE;
@@ -24,6 +27,7 @@ InventoryTest::InputType InventoryTest::GetInput()
 
     while (1) {
         if (_kbhit) {
+            requestRender = true;
             switch (_getch())
             {
             case 'w':
@@ -45,29 +49,33 @@ void InventoryTest::RunLobby()
 {
     switch (input)
     {
-    case InventoryTest::InputType::NONE:
+    case InputType::NONE:
         break;
-    case InventoryTest::InputType::UP:
+    case InputType::UP:
         cursor--;
         if (cursor < 0)
             cursor = 2;
 
         requestInput = true;
-        requestRender = true;
         break;
-    case InventoryTest::InputType::DOWN:
+    case InputType::DOWN:
         cursor = (++cursor) % 3;
 
         requestInput = true;
-        requestRender = true;
         break;
-    case InventoryTest::InputType::YES:
-        if (cursor == 3)
+    case InputType::YES:
+        if (cursor == 0) {
+            shop->Init(&money, list);
+            gameState = GameState::SHOP;
+        }
+        else if (cursor == 1)
+            gameState = GameState::BAG;
+        else if (cursor == 2)
             gameState = GameState::EXIT;
-        else
-            requestInput = true;
+        cursor = 0;
+        requestInput = true;
         break;
-    case InventoryTest::InputType::CANCEL:
+    case InputType::CANCEL:
         gameState = GameState::EXIT;
         requestRender = false;
         requestInput = false;
@@ -81,9 +89,9 @@ void InventoryTest::RunBag()
 {
     switch (input)
     {
-    case InventoryTest::InputType::NONE:
+    case InputType::NONE:
         break;
-    case InventoryTest::InputType::UP:
+    case InputType::UP:
         cursor--;
         if (cursor < 0)
             cursor = list->GetSize();
@@ -91,23 +99,26 @@ void InventoryTest::RunBag()
         requestInput = true;
         requestRender = true;
         break;
-    case InventoryTest::InputType::DOWN:
+    case InputType::DOWN:
         cursor = (++cursor) % (list->GetSize() + 1);
 
         requestInput = true;
         requestRender = true;
         break;
-    case InventoryTest::InputType::YES:
+    case InputType::YES:
         if (cursor == list->GetSize()) {
             gameState = GameState::LOBBY;
+            cursor = 0;
             requestRender = true;
         }
         requestInput = true;
         break;
-    case InventoryTest::InputType::CANCEL:
+    case InputType::CANCEL:
         gameState = GameState::LOBBY;
+        cursor = 0;
         requestRender = true;
         requestInput = true;
+
         break;
     default:
         break;
@@ -116,18 +127,18 @@ void InventoryTest::RunBag()
 
 void InventoryTest::RunShop()
 {
+    if (shop->Run(input))
+        gameState = GameState::LOBBY;
+    requestRender = true;
+    requestInput = true;
 }
 
 void InventoryTest::Run()
 {
-    gameState = GameState::BAG;
+    gameState = GameState::LOBBY;
     requestInput = true;
     requestRender = true;
-    AddMoney(3000);
-    AddItem(0, 4);
-    AddItem(1, 1);
-    AddItem(2, 1);
-    AddItem(0, 1);
+    money += 3000;
 
     while (1) {
         Render();
@@ -141,10 +152,13 @@ void InventoryTest::Run()
             RunBag();
             break;
         case InventoryTest::GameState::SHOP:
+            RunShop();
             break;
         case InventoryTest::GameState::EXIT:
-            return;
+            break;
         }
+        if (gameState == GameState::EXIT)
+            break;
     }
 }
 
@@ -160,8 +174,15 @@ void InventoryTest::Render()
 	case InventoryTest::GameState::LOBBY:
 	{
 		cout << "[로비]" << endl;
+        if (cursor == 0)
+            cout << "->";
         cout << "\t상점" << endl;
+        if (cursor == 1)
+            cout << "->";
         cout << "\t가방" << endl;
+        if(cursor == 2)
+            cout << "->";
+        cout << "\t종료" << endl;
         cout << "\n==================================\n"
             << "위 : W, 아래 : S, Z: 확인 X: 종료\n";
 	}
@@ -169,7 +190,8 @@ void InventoryTest::Render()
 
 	case InventoryTest::GameState::BAG:
 	{
-		cout << "[가방]" << endl;
+		cout << "[가방]\n";
+        cout << "소지금 : " << money << "\n";
 		int cnt = 0;
 		for (auto node = list->GetFront(); node != nullptr; node = node->next, cnt++) {
 			if (cursor == cnt)
@@ -189,11 +211,7 @@ void InventoryTest::Render()
 
 	case InventoryTest::GameState::SHOP:
 	{
-		cout << "[상점]" << endl;
-
-
-        cout << "\n==================================\n"
-            << "위 : W, 아래 : S, Z: 확인 X: 뒤로\n";
+        shop->Render();
 	}
 	break;
 	}
@@ -202,13 +220,8 @@ void InventoryTest::Render()
     //상황별 
 }
 
-bool InventoryTest::UseMoney(int pay)
+void InventoryTest::OpenShop()
 {
-    if(!AblePay(pay))
-        return false;
-
-    money -= pay;
-    return true;
 }
 
 void InventoryTest::AddItem(int id, int cnt)
