@@ -128,11 +128,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="C_221215.cpp" />
+    <ClCompile Include="DoublyNode.cpp" />
+    <ClCompile Include="InventoryTest.cpp" />
     <ClCompile Include="LinkedList.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DoublyLinkedList.h" />
+    <ClInclude Include="DoublyNode.h" />
+    <ClInclude Include="InventoryTest.h" />
+    <ClInclude Include="ItemNode.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Template.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,11 +1,12 @@
 #pragma once
-struct Node
+template <typename T>
+struct SinglyNode
 {
 public:
-	Node(int data) : data(data) {};
-	~Node() { if(next) delete next; }
+	SinglyNode(int data) : data(data) {};
+	~SinglyNode() { if(next) delete next; }
 
 	int data = 0;
-	Node* next = nullptr;
+	SinglyNode* next = nullptr;
 };
 
